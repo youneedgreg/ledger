@@ -17,3 +17,11 @@ Built to show that money is never created, lost or double-spent, even under conc
 ## Status
 
 🚧 Early development. See [ROADMAP.md](ROADMAP.md).
+
+## Documentation
+
+- [PRD](docs/prd.md): goals, user stories and the invariants Ledger must never break
+- [Design doc](docs/design-doc.md): architecture, data model, concurrency model and failure analysis
+- [ADRs](docs/adr/README.md): why each major decision was made
+- [Threat model](docs/threat-model.md): STRIDE analysis
+- [Diagrams](docs/diagrams/README.md): C4, ERD, sequence and state diagrams
