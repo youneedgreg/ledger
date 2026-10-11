@@ -8,12 +8,12 @@
 2. Entries are immutable. Refunds are reversing transactions.
 3. Every transaction's entries sum to zero, enforced by a deferred constraint trigger.
 4. SERIALIZABLE isolation with bounded, jittered retries on SQLSTATE `40001`/`40P01`.
-5. Idempotency keys scoped per merchant, storing request hash and response, written in the same transaction as the ledger write. Same key + different body → 422; concurrent same key → 409.
+5. Idempotency keys scoped per merchant, storing request hash and response, written in the same transaction as the ledger write. Same key + different body → 422; a concurrent same-key request waits and replays the result, or gets 409 if it waits longer than 2 s.
 6. Transactional outbox; relay uses `FOR UPDATE SKIP LOCKED`.
 7. Exactly-once effects = at-least-once delivery + idempotent consumers (dedupe on event ID).
 8. Holds: authorize → capture (partial/full) → void → expire, as an explicit state machine.
 
-## Week 0: Design before code
+## Week 0: Design before code ✅
 - PRD, design doc, first 6 ADRs, STRIDE threat model
 - C4 L1 + L2, ERD, transfer sequence diagram, Hold state machine
 - GitHub Project board with a milestone per week
