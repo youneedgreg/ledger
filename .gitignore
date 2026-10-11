@@ -1,0 +1,47 @@
+# OS / editors
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Env and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+htmlcov/
+dist/
+*.egg-info/
+
+# Node
+node_modules/
+.pnpm-store/
+.next/
+out/
+build/
+coverage/
+*.tsbuildinfo
+.turbo/
+
+# Infra
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+kubeconfig*
+
+# Test / load output
+playwright-report/
+test-results/
+k6-results/
+chaos-reports/
