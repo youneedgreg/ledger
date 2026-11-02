@@ -18,6 +18,25 @@ Built to show that money is never created, lost or double-spent, even under conc
 
 🚧 Early development. See [ROADMAP.md](ROADMAP.md).
 
+## Local development
+
+Requires Docker, [uv](https://docs.astral.sh/uv/) and pnpm.
+
+```bash
+cp .env.example .env   # then replace each value: openssl rand -hex 32
+docker compose up -d --build
+curl http://127.0.0.1:3000/healthz
+```
+
+`docker compose` starts Postgres, applies migrations, sets the database role passwords, then starts the core and the gateway. Only the gateway and Postgres are published to the host, and only on `127.0.0.1`. If port 3000 or 5432 is taken, set `LEDGER_GATEWAY_PORT` or `LEDGER_POSTGRES_PORT` in `.env`.
+
+Run the tests:
+
+```bash
+uv run --package ledger-core pytest services/ledger-core   # integration tests start a real Postgres in Docker
+pnpm install && pnpm test
+```
+
 ## Documentation
 
 - [PRD](docs/prd.md): goals, user stories and the invariants Ledger must never break
