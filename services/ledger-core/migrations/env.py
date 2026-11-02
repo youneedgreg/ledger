@@ -5,7 +5,8 @@ from sqlalchemy import create_engine, pool
 
 
 def database_url() -> str:
-    url = context.config.get_main_option("sqlalchemy.url") or os.environ["LEDGER_MIGRATOR_DATABASE_URL"]
+    url = context.config.get_main_option("sqlalchemy.url")
+    url = url or os.environ["LEDGER_MIGRATOR_DATABASE_URL"]
     # SQLAlchemy defaults to psycopg2 for a plain postgresql:// URL.
     return url.replace("postgresql://", "postgresql+psycopg://", 1)
 

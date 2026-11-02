@@ -47,7 +47,9 @@ def upgrade() -> None:
     op.execute(f"GRANT USAGE ON SCHEMA public TO {ROLE_LIST}")
 
     # The reconciler can read every table the migrator creates from now on.
-    op.execute("ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO ledger_reconciler")
+    op.execute(
+        "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO ledger_reconciler"
+    )
 
 
 def downgrade() -> None:

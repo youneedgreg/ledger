@@ -4,7 +4,7 @@ import psycopg
 import pytest
 from alembic import command
 from alembic.config import Config
-from psycopg.conninfo import conninfo_to_dict, make_conninfo
+from psycopg.conninfo import make_conninfo
 
 from ledger_core.db_roles import set_role_passwords
 
@@ -14,9 +14,7 @@ pytestmark = pytest.mark.integration
 
 
 def role_url(migrator_url: str, role: str) -> str:
-    params = conninfo_to_dict(migrator_url)
-    params.update(user=role, password=ROLE_PASSWORDS[role])
-    return make_conninfo(**params)
+    return make_conninfo(migrator_url, user=role, password=ROLE_PASSWORDS[role])
 
 
 @pytest.fixture
@@ -56,9 +54,7 @@ def test_service_roles_have_no_elevated_attributes(
     assert attributes == (False, False, False)
 
 
-def test_reconciler_can_read_new_tables_but_not_write(
-    probe_table: None, migrator_url: str
-) -> None:
+def test_reconciler_can_read_new_tables_but_not_write(probe_table: None, migrator_url: str) -> None:
     with psycopg.connect(role_url(migrator_url, "ledger_reconciler")) as connection:
         assert connection.execute("SELECT id FROM probe").fetchone() == (1,)
         with pytest.raises(psycopg.errors.InsufficientPrivilege):
@@ -69,17 +65,18 @@ def test_reconciler_can_read_new_tables_but_not_write(
 def test_other_roles_get_no_table_access_by_default(
     probe_table: None, migrator_url: str, role: str
 ) -> None:
-    with psycopg.connect(role_url(migrator_url, role)) as connection:
-        with pytest.raises(psycopg.errors.InsufficientPrivilege):
-            connection.execute("SELECT id FROM probe")
+    with (
+        psycopg.connect(role_url(migrator_url, role)) as connection,
+        pytest.raises(psycopg.errors.InsufficientPrivilege),
+    ):
+        connection.execute("SELECT id FROM probe")
 
 
 def test_wrong_password_is_rejected(roles_ready: None, migrator_url: str) -> None:
-    params = conninfo_to_dict(migrator_url)
-    params.update(user="ledger_app", password="wrong")
+    wrong_password = make_conninfo(migrator_url, user="ledger_app", password="wrong")
 
     with pytest.raises(psycopg.OperationalError):
-        psycopg.connect(make_conninfo(**params))
+        psycopg.connect(wrong_password)
 
 
 def test_setting_passwords_twice_is_safe(roles_ready: None, migrator_url: str) -> None:

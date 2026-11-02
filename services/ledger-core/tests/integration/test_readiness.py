@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from psycopg.conninfo import conninfo_to_dict, make_conninfo
+from psycopg.conninfo import make_conninfo
 
 from ledger_core.config import Settings
 from ledger_core.db_roles import set_role_passwords
@@ -11,13 +11,10 @@ from .conftest import ROLE_PASSWORDS
 pytestmark = pytest.mark.integration
 
 
-def test_ready_when_postgres_is_reachable_as_ledger_app(
-    migrated: str, migrator_url: str
-) -> None:
+def test_ready_when_postgres_is_reachable_as_ledger_app(migrated: str, migrator_url: str) -> None:
     set_role_passwords(migrator_url, ROLE_PASSWORDS)
-    params = conninfo_to_dict(migrator_url)
-    params.update(user="ledger_app", password=ROLE_PASSWORDS["ledger_app"])
-    app = create_app(Settings(database_url=make_conninfo(**params)))
+    app_url = make_conninfo(migrator_url, user="ledger_app", password=ROLE_PASSWORDS["ledger_app"])
+    app = create_app(Settings(database_url=app_url))
 
     with TestClient(app) as client:
         response = client.get("/readyz")
