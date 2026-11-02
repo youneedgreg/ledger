@@ -3,12 +3,14 @@ import json
 import pytest
 from fastapi.testclient import TestClient
 
+from ledger_core.config import Settings
 from ledger_core.main import create_app
 
 
 @pytest.fixture
 def client() -> TestClient:
-    return TestClient(create_app())
+    # The lifespan never runs here, so nothing connects to this URL.
+    return TestClient(create_app(Settings(database_url="postgresql://unused")))
 
 
 def test_healthz_returns_ok(client: TestClient) -> None:

@@ -4,7 +4,9 @@ version = "0.1.0"
 description = "Double-entry ledger core"
 requires-python = ">=3.14"
 dependencies = [
+    "alembic>=1.20.1",
     "fastapi>=0.162.0",
+    "psycopg[binary,pool]>=3.3.6",
     "pydantic-settings>=2.16.2",
     "structlog>=26.1.0",
     "uvicorn[standard]>=0.54.0",
@@ -19,9 +21,11 @@ packages = ["src/ledger_core"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = ["integration: needs Docker for a real Postgres"]
 
 [dependency-groups]
 dev = [
     "httpx2>=2.16.0",
     "pytest>=9.2.0",
+    "testcontainers>=4.15.0",
 ]
