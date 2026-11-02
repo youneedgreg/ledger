@@ -37,6 +37,12 @@ uv run --package ledger-core pytest services/ledger-core   # integration tests s
 pnpm install && pnpm test
 ```
 
+Install the git hooks once after cloning. They run ruff, mypy, ESLint, tsc and gitleaks on commit, check the commit message format, and run the unit tests on push:
+
+```bash
+uv sync --all-packages && uv run pre-commit install
+```
+
 ## Documentation
 
 - [PRD](docs/prd.md): goals, user stories and the invariants Ledger must never break
