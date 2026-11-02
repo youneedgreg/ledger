@@ -1,5 +1,8 @@
 # Ledger
 
+[![CI](https://github.com/youneedgreg/ledger/actions/workflows/ci.yml/badge.svg)](https://github.com/youneedgreg/ledger/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/youneedgreg/ledger/actions/workflows/codeql.yml/badge.svg)](https://github.com/youneedgreg/ledger/actions/workflows/codeql.yml)
+
 A double-entry payments ledger with a Stripe-style API: accounts, transfers, holds, refunds and signed webhooks.
 
 Built to show that money is never created, lost or double-spent, even under concurrency, retries and pods being killed mid-transfer.
