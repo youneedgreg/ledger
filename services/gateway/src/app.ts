@@ -22,9 +22,9 @@ export function loggerOptions(level: string): LoggerOptions {
   };
 }
 
-export type BuildOptions = {
+export interface BuildOptions {
   logger?: FastifyServerOptions["logger"];
-};
+}
 
 export function buildApp(options: BuildOptions = {}): FastifyInstance {
   const app = Fastify({
@@ -35,12 +35,13 @@ export function buildApp(options: BuildOptions = {}): FastifyInstance {
     genReqId: () => `req_${randomUUID()}`,
   });
 
-  app.addHook("onRequest", async (request, reply) => {
+  app.addHook("onRequest", (request, reply, done) => {
     void reply.header("Request-Id", request.id);
+    done();
   });
 
   // Liveness: the process is up. Doesn't call the core.
-  app.get("/healthz", async () => ({ status: "ok" }));
+  app.get("/healthz", () => ({ status: "ok" }));
 
   return app;
 }
