@@ -1,0 +1,12 @@
+.git
+.venv
+.env
+.env.*
+**/node_modules
+**/dist
+**/__pycache__
+**/.pytest_cache
+**/.DS_Store
+docs
+services/ledger-core/tests
+services/gateway/test

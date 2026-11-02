@@ -1,0 +1,43 @@
+[project]
+name = "ledger-workspace"
+version = "0.0.0"
+description = "uv workspace root for Ledger's Python services"
+requires-python = ">=3.14"
+dependencies = []
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["services/ledger-core"]
+
+[dependency-groups]
+dev = [
+    "mypy>=2.4.1",
+    "pre-commit>=4.7.0",
+    "ruff>=0.17.3",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "UP", "B", "S", "ASYNC", "C4", "DTZ", "PT", "RET", "SIM", "T20", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests use assert, and their passwords are throwaway values for a disposable Postgres.
+"services/ledger-core/tests/**" = ["S101", "S105", "S106"]
+# Role names in migrations are constants, not user input.
+"services/ledger-core/migrations/versions/*" = ["S608"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ledger_core"]
+
+[tool.mypy]
+strict = true
+python_version = "3.14"
+mypy_path = "services/ledger-core/src"
+explicit_package_bases = true
+plugins = ["pydantic.mypy"]
+files = ["services/ledger-core/src", "services/ledger-core/tests", "services/ledger-core/migrations/env.py"]

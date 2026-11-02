@@ -1,0 +1,68 @@
+name: ledger
+
+x-core-image: &core-image
+  build:
+    context: .
+    dockerfile: services/ledger-core/Dockerfile
+  image: ledger-core:dev
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ledger
+      POSTGRES_USER: ledger_migrator
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?copy .env.example to .env}
+    ports:
+      - "127.0.0.1:${LEDGER_POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ledger_migrator -d ledger"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    mem_limit: 512m
+
+  # One-shot: applies migrations, sets role passwords, then exits.
+  migrate:
+    <<: *core-image
+    command: ["sh", "-c", "alembic upgrade head && python -m ledger_core.db_roles"]
+    environment:
+      LEDGER_MIGRATOR_DATABASE_URL: postgresql://ledger_migrator:${POSTGRES_PASSWORD}@postgres:5432/ledger
+      LEDGER_APP_DB_PASSWORD: ${LEDGER_APP_DB_PASSWORD:?copy .env.example to .env}
+      LEDGER_RELAY_DB_PASSWORD: ${LEDGER_RELAY_DB_PASSWORD:?copy .env.example to .env}
+      LEDGER_RECONCILER_DB_PASSWORD: ${LEDGER_RECONCILER_DB_PASSWORD:?copy .env.example to .env}
+    healthcheck:
+      disable: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  # Not published to the host: only the gateway is public (threat model S2).
+  core:
+    <<: *core-image
+    environment:
+      LEDGER_DATABASE_URL: postgresql://ledger_app:${LEDGER_APP_DB_PASSWORD}@postgres:5432/ledger
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    mem_limit: 256m
+
+  gateway:
+    build:
+      context: .
+      dockerfile: services/gateway/Dockerfile
+    image: ledger-gateway:dev
+    environment:
+      PORT: "3000"
+    ports:
+      - "127.0.0.1:${LEDGER_GATEWAY_PORT:-3000}:3000"
+    depends_on:
+      core:
+        condition: service_healthy
+    mem_limit: 256m
+
+volumes:
+  postgres-data:

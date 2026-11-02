@@ -1,0 +1,4 @@
+packages:
+  - "services/gateway"
+onlyBuiltDependencies:
+  - esbuild
