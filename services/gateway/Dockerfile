@@ -1,5 +1,5 @@
 # Build from the repo root: docker build -f services/gateway/Dockerfile .
-FROM node:24-slim AS build
+FROM node:26-slim AS build
 RUN corepack enable
 WORKDIR /app
 
@@ -12,7 +12,7 @@ COPY services/gateway services/gateway
 RUN pnpm --filter @ledger/gateway build
 RUN pnpm --filter @ledger/gateway --prod deploy --legacy /out
 
-FROM node:24-slim
+FROM node:26-slim
 ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=build /out .
