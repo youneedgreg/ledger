@@ -1,5 +1,5 @@
 # Build from the repo root: docker build -f services/ledger-core/Dockerfile .
-FROM python:3.14-slim AS build
+FROM python:3.15-slim AS build
 COPY --from=ghcr.io/astral-sh/uv:0.11.23 /uv /usr/local/bin/uv
 ENV UV_LINK_MODE=copy UV_PYTHON_DOWNLOADS=never
 WORKDIR /app
@@ -12,7 +12,7 @@ RUN uv sync --frozen --no-dev --package ledger-core --no-install-workspace
 COPY services/ledger-core/src services/ledger-core/src
 RUN uv sync --frozen --no-dev --package ledger-core --no-editable
 
-FROM python:3.14-slim
+FROM python:3.15-slim
 RUN useradd --system --uid 10001 --no-create-home ledger
 WORKDIR /app
 COPY --from=build /app/.venv .venv
